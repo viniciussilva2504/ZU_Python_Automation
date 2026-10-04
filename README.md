@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="docs/assets/demo.gif" alt="Appium test running in the Android emulator" width="280">
-</p>
+![Appium test running in the Android emulator](docs/assets/demo.gif)
 
 # ZU Android UI Automation
 
@@ -13,7 +11,7 @@ Android UI automation for the ZU app, built with Python, Appium, and pytest. Eac
 ## What the tests cover
 
 - `test_zu_smoke.py` launches the ZU app and confirms that it is in the foreground.
-- `test_zu_home.py` handles the update prompt, moves through onboarding with the **Next** button, and checks that the app reaches the following screen.
+   - `test_zu_home.py` handles the update prompt, moves through onboarding with the **Next** button, and checks that the app reaches the following screen.
 
 The onboarding test pauses after each step so you can inspect or capture the screen. Run it with `-s` so pytest accepts Enter from the terminal.
 
