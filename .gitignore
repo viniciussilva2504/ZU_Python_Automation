@@ -1,0 +1,15 @@
+# Ambientes e cache Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Ficheiros locais do editor
+.idea/
+.vscode/
+
+# Gravações e screenshots criados durante os testes
+artifacts/videos/
+artifacts/screenshots/
+
+# Mantém o GIF de demonstração em docs/assets versionável para o README.
