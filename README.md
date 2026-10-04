@@ -1,33 +1,33 @@
+![Appium test running in the Android emulator](docs/assets/demo.gif)
+
 # ZU Android UI Automation
 
-![Demonstração dos testes Appium no Android](docs/assets/demo.gif)
+![Screenshot of the ZU app captured by a passing test](docs/assets/app-screen.png)
 
-Automação de interface Android para a aplicação ZU, construída com Python, Appium e pytest. Cada sessão Appium grava o ecrã do emulador em MP4; quando um teste passa, o projeto atualiza o GIF de demonstração usado neste README.
+Android UI automation for the ZU app, built with Python, Appium, and pytest. Each Appium session records the emulator screen to MP4. When a test passes, the project refreshes the demo GIF and portfolio screenshot shown here.
 
-> O GIF é criado na primeira execução bem-sucedida de um teste Appium. Os vídeos MP4 e screenshots completos ficam localmente em `artifacts/` e não são adicionados ao Git.
+> The GIF and portfolio screenshot are generated after a successful Appium test. Full MP4 recordings and per-session screenshots stay local in `artifacts/` and are excluded from Git.
 
-![Screenshot do ecrã da aplicação ZU capturado pelo teste](docs/assets/app-screen.png)
+## What the tests cover
 
-## O que este projeto verifica
+- `test_zu_smoke.py` launches the ZU app and confirms that it is in the foreground.
+- `test_zu_home.py` handles the update prompt, moves through onboarding with the **Next** button, and checks that the app reaches the following screen.
 
-- `test_zu_smoke.py`: abre a aplicação ZU e confirma que ela fica em primeiro plano.
-- `test_zu_home.py`: trata o aviso de atualização, percorre o onboarding com o botão **Next** e confirma que a aplicação chegou ao ecrã seguinte.
+The onboarding test pauses after each step so you can inspect or capture the screen. Run it with `-s` so pytest accepts Enter from the terminal.
 
-O teste de onboarding tem pausas interativas para permitir observar e fotografar cada passo. Execute-o com `-s` para o pytest aceitar a tecla Enter.
+## Requirements
 
-## Requisitos
+- Windows, Python, and a project virtual environment.
+- Node.js, the Appium Server, and the Appium UiAutomator2 driver.
+- Android SDK Platform Tools (`adb`) and a running Android emulator.
+- The ZU app installed on the emulator (`pt.continente.ZU`).
+- FFmpeg on `PATH` to convert recordings to GIF. MP4 recordings are still saved without FFmpeg.
 
-- Windows com Python e um ambiente virtual do projeto.
-- Node.js, Appium Server e o driver UiAutomator2 do Appium.
-- Android SDK Platform Tools (`adb`) e um emulador Android iniciado.
-- Aplicação ZU instalada no emulador (`pt.continente.ZU`).
-- FFmpeg no `PATH` para converter a gravação em GIF. Sem FFmpeg, os vídeos MP4 continuam a ser guardados.
+The default emulator in the capabilities is `emulator-5554`.
 
-O emulador usado por omissão nas capabilities é `emulator-5554`.
+## Set up the Python environment
 
-## Preparar o ambiente Python
-
-Na pasta do projeto, abra um terminal PowerShell:
+Open a PowerShell terminal in the project directory:
 
 ```powershell
 py -m venv .venv
@@ -35,97 +35,97 @@ py -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-Instale o driver UiAutomator2 uma vez, caso ainda não esteja instalado:
+Install the UiAutomator2 driver once if it is not already installed:
 
 ```powershell
 appium driver install uiautomator2
 ```
 
-## Iniciar o emulador, Appium e os testes
+## Start the emulator, Appium, and the tests
 
-1. Inicie o emulador no Android Studio e espere a tela inicial carregar.
-2. Confirme a ligação pelo ADB:
+1. Start the emulator in Android Studio and wait for its home screen.
+2. Check the Android connection with ADB:
 
    ```powershell
    adb devices
    ```
 
-   A lista deve incluir `emulator-5554` com o estado `device`.
+   The list should include `emulator-5554` with the state `device`.
 
-3. Abra um terminal PowerShell para o Appium e deixe-o aberto durante os testes:
+3. Open a PowerShell terminal for Appium and leave it running while the tests execute:
 
    ```powershell
    appium --address 127.0.0.1 --port 4723
    ```
 
-   Confirme que o Appium está a escutar na porta usada pelo teste:
+   Confirm that Appium is listening on the port used by the tests:
 
    ```powershell
    Test-NetConnection 127.0.0.1 -Port 4723
    ```
 
-   O resultado esperado é `TcpTestSucceeded : True`.
+   The expected result is `TcpTestSucceeded : True`.
 
-4. Num segundo terminal, com `.venv` ativo, execute os dois testes:
+4. In a second terminal, activate `.venv` and run both tests:
 
    ```powershell
    pytest -s -v tests/test_zu_smoke.py tests/test_zu_home.py
    ```
 
-   O `-s` deixa o teste de onboarding receber Enter nas pausas interativas. Pressione Enter em cada pausa para avançar; depois do último passo, o teste confirma que o botão **Next** desapareceu.
+   The `-s` option lets the onboarding test receive Enter during its interactive pauses. Press Enter at each pause to advance. After the final step, the test checks that the **Next** button is gone.
 
-Para executar apenas o teste rápido de abertura:
+To run only the quick app launch check:
 
 ```powershell
 pytest -v tests/test_zu_smoke.py
 ```
 
-Para executar sem gravar vídeo:
+To run without recording video:
 
 ```powershell
 pytest -v --no-record-video tests/test_zu_smoke.py
 ```
 
-## Gravações e GIF do README
+## Recordings and the README GIF
 
-O fixture `appium_driver` grava o ecrã do emulador durante cada sessão Appium e, no encerramento, guarda:
+The `appium_driver` fixture records the emulator screen for each Appium session. When the session ends, it saves:
 
-- Vídeo MP4 em `artifacts/videos/`.
-- Screenshot final em `artifacts/screenshots/`.
-- Screenshot selecionado em `docs/assets/app-screen.png` quando o teste passou.
-- GIF compacto em `docs/assets/demo.gif` quando o teste passou e o FFmpeg está instalado.
+- An MP4 recording in `artifacts/videos/`.
+- A final screenshot in `artifacts/screenshots/`.
+- A selected screenshot in `docs/assets/app-screen.png` when the test passes.
+- A compact GIF in `docs/assets/demo.gif` when the test passes and FFmpeg is installed.
 
-Os MP4 e screenshots completos são locais e estão ignorados pelo Git. O GIF e o screenshot selecionados são prévias pequenas para o portfólio e podem ser versionados para aparecer no README.
+Full MP4s and per-session screenshots stay local and are ignored by Git. The GIF and selected screenshot are small portfolio previews and can be committed so they appear on GitHub.
 
-Para gerar novamente o GIF a partir da gravação mais recente:
+To rebuild the GIF from the latest recording:
 
 ```powershell
 python scripts/build_demo_gif.py
 ```
 
-Para escolher uma gravação ou um trecho específico:
+To select a recording or a specific segment:
 
 ```powershell
-python scripts/build_demo_gif.py --input artifacts/videos/NOME_DA_GRAVACAO.mp4 --start 5 --duration 12
+python scripts/build_demo_gif.py --input artifacts/videos/RECORDING_NAME.mp4 --start 5 --duration 12
 ```
 
-O gravador de ecrã do Android limita cada sessão a três minutos. O teste de onboarding pode ser mais demorado por causa das pausas manuais; o MP4 pode terminar ao atingir esse limite.
+Android screen recording is limited to three minutes per session. The onboarding test may take longer because of its manual pauses, so its MP4 can stop when it reaches that limit.
 
-## Estrutura
+## Project structure
 
 ```text
 .
 ├── tests/
-│   ├── conftest.py          # Fixtures Appium, onboarding e captura de artefactos
-│   ├── test_zu_smoke.py     # Verificação de abertura da aplicação
-│   └── test_zu_home.py      # Percurso do onboarding
+│   ├── conftest.py          # Appium fixtures, onboarding, and artifact capture
+│   ├── test_zu_smoke.py     # App launch check
+│   └── test_zu_home.py      # Onboarding flow
 ├── scripts/
-│   └── build_demo_gif.py    # Conversão de MP4 para GIF com FFmpeg
+│   └── build_demo_gif.py    # Converts MP4 recordings to GIF with FFmpeg
 ├── artifacts/
-│   ├── videos/              # MP4 por sessão (local, ignorado pelo Git)
-│   └── screenshots/         # Captura final por sessão (local, ignorada pelo Git)
+│   ├── videos/              # Per-session MP4 recordings (local, Git-ignored)
+│   └── screenshots/         # Per-session screenshots (local, Git-ignored)
 ├── docs/assets/
-│   ├── demo.gif             # Prévia animada apresentada acima
-│   └── app-screen.png       # Screenshot de uma execução bem-sucedida
+│   ├── demo.gif             # Animated preview shown at the top
+│   └── app-screen.png       # Screenshot from a passing test
 └── requirements.txt
 ```
