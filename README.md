@@ -1,4 +1,6 @@
-![Appium test running in the Android emulator](docs/assets/demo.gif)
+<p align="center">
+  <img src="docs/assets/demo.gif" alt="Appium test running in the Android emulator" width="280">
+</p>
 
 # ZU Android UI Automation
 
