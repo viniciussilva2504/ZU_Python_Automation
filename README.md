@@ -8,9 +8,9 @@ Android UI automation for the ZU app, built with Python, Appium, and pytest. The
 
 ### Onboarding test
 
-![GIF preview of the ZU onboarding test running in the Android emulator](docs/assets/home-test.gif)
+![GIF preview of the final onboarding steps in the ZU Android emulator](docs/assets/onboarding-final.gif)
 
-The previews show the first 12 seconds of each recording. Full MP4 recordings and per-session screenshots stay local in `artifacts/` and are excluded from Git.
+The smoke test preview shows the first 12 seconds of its recording; the onboarding preview shows the final 12 seconds, including the last pause before the test ends. Full MP4 recordings and per-session screenshots stay local in `artifacts/` and are excluded from Git.
 
 ## What the tests cover
 
