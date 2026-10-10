@@ -1,12 +1,16 @@
-![Appium test running in the Android emulator](docs/assets/demo.gif)
-
 # ZU Android UI Automation
 
-![Screenshot of the ZU app captured by a passing test](docs/assets/app-screen.png)
+Android UI automation for the ZU app, built with Python, Appium, and pytest. The project records each Appium session and includes short animated previews of both test runs.
 
-Android UI automation for the ZU app, built with Python, Appium, and pytest. Each Appium session records the emulator screen to MP4. When a test passes, the project refreshes the demo GIF and portfolio screenshot shown here.
+### Smoke test
 
-> The GIF and portfolio screenshot are generated after a successful Appium test. Full MP4 recordings and per-session screenshots stay local in `artifacts/` and are excluded from Git.
+![GIF preview of the ZU smoke test running in the Android emulator](docs/assets/smoke-test.gif)
+
+### Onboarding test
+
+![GIF preview of the ZU onboarding test running in the Android emulator](docs/assets/home-test.gif)
+
+The previews show the first 12 seconds of each recording. Full MP4 recordings and per-session screenshots stay local in `artifacts/` and are excluded from Git.
 
 ## What the tests cover
 
