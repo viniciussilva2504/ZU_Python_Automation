@@ -54,7 +54,7 @@ def save_screenshot(driver, name, test_node):
 
         report = getattr(test_node, "rep_call", None)
         if report is not None and report.passed and _is_portfolio_test(test_node):
-            preview_path = PROJECT_ROOT / "docs" / "assets" / "app-screen.png"
+            preview_path = PROJECT_ROOT / "artifacts" / "visuals" / "app-screen.png"
             preview_path.parent.mkdir(parents=True, exist_ok=True)
             preview_path.write_bytes(screenshot)
             print(
@@ -73,7 +73,7 @@ def build_readme_gif(video_path):
         "--input",
         str(video_path),
         "--output",
-        str(PROJECT_ROOT / "docs" / "assets" / "demo.gif"),
+        str(PROJECT_ROOT / "artifacts" / "visuals" / "demo.gif"),
     ]
     result = subprocess.run(command, capture_output=True, text=True, check=False)
     message = result.stdout.strip() or result.stderr.strip()
