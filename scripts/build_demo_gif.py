@@ -10,7 +10,7 @@ import subprocess
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 VIDEO_DIR = PROJECT_ROOT / "artifacts" / "videos"
-DEFAULT_OUTPUT = PROJECT_ROOT / "docs" / "assets" / "demo.gif"
+DEFAULT_OUTPUT = PROJECT_ROOT / "artifacts" / "visuals" / "demo.gif"
 
 
 def _latest_recording() -> Path:

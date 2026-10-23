@@ -2,7 +2,7 @@
 
 Android UI automation for the ZU app using **Python, Appium, and pytest**. The suite verifies that the app opens and advances through onboarding to its final screen. Each Appium session can also save a screen recording and screenshot to support failure analysis.
 
-![Preview of the final ZU onboarding screen](docs/assets/onboarding-final.gif)
+![Preview of the final ZU onboarding screen](artifacts/visuals/onboarding-final.gif)
 
 ## Why this project
 
@@ -23,7 +23,7 @@ These previews were created from Appium session recordings:
 
 | App launch | Onboarding | Final onboarding steps |
 | --- | --- | --- |
-| ![App launch test](docs/assets/smoke-test.gif) | ![Onboarding test](docs/assets/home-test.gif) | ![Final onboarding steps](docs/assets/onboarding-final.gif) |
+| ![App launch test](artifacts/visuals/smoke-test.gif) | ![Onboarding test](artifacts/visuals/home-test.gif) | ![Final onboarding steps](artifacts/visuals/onboarding-final.gif) |
 
 ## Requirements
 
@@ -101,9 +101,9 @@ The `appium_driver` fixture starts one Appium session per test and attempts to s
 
 - An MP4 recording in `artifacts/videos/` (Android screen recording is limited to three minutes per session).
 - A session screenshot in `artifacts/screenshots/`, including screenshots from failed sessions.
-- When the portfolio-marked test passes, a screenshot at `docs/assets/app-screen.png` and, if FFmpeg is available, a GIF at `docs/assets/demo.gif`. The onboarding test carries this marker; the smoke test does not overwrite the portfolio previews.
+- When the portfolio-marked test passes, a screenshot at `artifacts/visuals/app-screen.png` and, if FFmpeg is available, a GIF at `artifacts/visuals/demo.gif`. The onboarding test carries this marker; the smoke test does not overwrite the portfolio previews.
 
-MP4 recordings and per-session screenshots are local and excluded from Git. The previews in `docs/assets/` are versioned so they appear on GitHub. Rebuild a GIF from the most recent recording with:
+MP4 recordings and per-session screenshots are local and excluded from Git. The curated previews in `artifacts/visuals/` are versioned so they appear on GitHub. Rebuild a GIF from the most recent recording with:
 
 ```powershell
 python scripts/build_demo_gif.py
@@ -130,8 +130,10 @@ python scripts/build_demo_gif.py --input artifacts/videos/RECORDING_NAME.mp4 --s
 │   └── artifacts.py            # Video, screenshot, and GIF handling
 ├── scripts/
 │   └── build_demo_gif.py       # Converts MP4 recordings to GIF with FFmpeg
-├── docs/assets/                # Portfolio GIFs and selected screenshot
-├── artifacts/                  # Local evidence, ignored by Git
+├── artifacts/
+│   ├── visuals/                # Versioned portfolio GIFs and screenshots
+│   ├── videos/                 # Local MP4 recordings, ignored by Git
+│   └── screenshots/            # Per-session screenshots, ignored by Git
 ├── pytest.ini                  # Test discovery and Python import path
 └── requirements.txt            # Pinned Python dependencies
 ```
