@@ -13,9 +13,9 @@ O objetivo é demonstrar um fluxo de QA mobile de ponta a ponta: configurar uma 
 | Teste | Verificação |
 | --- | --- |
 | `test_zu_app_opens` | A aplicação ZU fica em primeiro plano no emulador. |
-| `test_zu_onboarding_leads_to_home` | O onboarding é percorrido e o botão **Next** deixa de estar visível no ecrã seguinte. |
+| `test_zu_onboarding_reaches_final_step` | O último ecrã do onboarding apresenta o botão **Enter** ativo, sem o botão **Next**. |
 
-O onboarding corre sem pausas por omissão. Para uma demonstração assistida, pode ativar-se o modo interativo, que aguarda Enter em cada etapa e no ecrã final. A execução automatizada permite integrar o fluxo num CI que tenha emulador, Appium e a app configurados.
+O teste termina no último ecrã do onboarding; não toca em **Enter** nem valida o conteúdo da home. O fluxo corre sem pausas por omissão. Para uma demonstração assistida, pode ativar-se o modo interativo, que aguarda Enter em cada etapa e no ecrã final. A execução automatizada permite integrar o fluxo num CI que tenha emulador, Appium e a app configurados.
 
 ## Evidências
 
@@ -101,7 +101,7 @@ O fixture `appium_driver` inicia uma sessão por teste e tenta guardar:
 
 - Vídeo MP4 em `artifacts/videos/` (limite de gravação do Android: 3 minutos por sessão).
 - Screenshot da sessão em `artifacts/screenshots/`, incluindo sessões que falham.
-- Quando o teste passa, screenshot de portfólio em `docs/assets/app-screen.png` e GIF em `docs/assets/demo.gif`, se o FFmpeg estiver disponível.
+- Quando o teste marcado como portfólio passa, screenshot em `docs/assets/app-screen.png` e GIF em `docs/assets/demo.gif`, se o FFmpeg estiver disponível. O teste de onboarding tem essa marca; o teste smoke não altera os previews publicados.
 
 Os MP4 e screenshots individuais são locais e estão excluídos do Git. Os previews em `docs/assets/` são versionados para aparecerem no README. Para reconstruir o GIF a partir da gravação mais recente:
 
@@ -120,13 +120,19 @@ python scripts/build_demo_gif.py --input artifacts/videos/RECORDING_NAME.mp4 --s
 ```text
 .
 ├── tests/
-│   ├── conftest.py          # Sessão Appium, navegação de onboarding e evidências
+│   ├── conftest.py          # Regista os plugins de fixtures da suíte
 │   ├── test_zu_smoke.py     # Verificação de abertura da app
-│   └── test_zu_home.py      # Percurso de onboarding
+│   └── test_zu_onboarding.py # Percurso e validação do último ecrã do onboarding
+├── zu_automation/
+│   ├── config.py            # Configuração Appium e da app via ambiente
+│   ├── fixtures.py          # Opções pytest e ciclo de vida do driver
+│   ├── onboarding.py        # Navegação e seletores do onboarding
+│   └── artifacts.py         # Gravação de vídeos, screenshots e GIF
 ├── scripts/
 │   └── build_demo_gif.py    # Conversão de MP4 para GIF com FFmpeg
 ├── docs/assets/             # GIFs e screenshot selecionado para o portfólio
 ├── artifacts/               # Evidências locais, ignoradas pelo Git
+├── pytest.ini                # Descoberta dos testes e caminho de importação
 └── requirements.txt         # Dependências Python fixadas
 ```
 
