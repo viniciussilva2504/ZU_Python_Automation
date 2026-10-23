@@ -1,37 +1,43 @@
-# ZU Android UI Automation
+# Automação Android da app ZU
 
-Android UI automation for the ZU app, built with Python, Appium, and pytest. The project records each Appium session and includes short animated previews of both test runs.
+Projeto de automação de interface Android com **Python, Appium e pytest**. A suíte valida a abertura da aplicação e percorre o onboarding até ao ecrã seguinte, guardando vídeo e screenshot de cada sessão para apoiar a análise de falhas.
 
-### Smoke test
+![Pré-visualização da execução do teste de onboarding](docs/assets/onboarding-final.gif)
 
-![GIF preview of the ZU smoke test running in the Android emulator](docs/assets/smoke-test.gif)
+## Porquê este projeto
 
-### Onboarding test
+O objetivo é demonstrar um fluxo de QA mobile de ponta a ponta: configurar uma sessão Appium, sincronizar com o estado real da interface, validar um percurso crítico e preservar evidências que tornam o resultado mais fácil de rever. O projeto também explora como apresentar essas evidências de forma leve e reproduzível num portfólio.
 
-![GIF preview of the final onboarding steps in the ZU Android emulator](docs/assets/onboarding-final.gif)
+## O que está coberto
 
-The smoke test preview shows the first 12 seconds of its recording; the onboarding preview shows the final 12 seconds, including the last pause before the test ends. Full MP4 recordings and per-session screenshots stay local in `artifacts/` and are excluded from Git.
+| Teste | Verificação |
+| --- | --- |
+| `test_zu_app_opens` | A aplicação ZU fica em primeiro plano no emulador. |
+| `test_zu_onboarding_leads_to_home` | O onboarding é percorrido e o botão **Next** deixa de estar visível no ecrã seguinte. |
 
-## What the tests cover
+O onboarding corre sem pausas por omissão. Para uma demonstração assistida, pode ativar-se o modo interativo, que aguarda Enter em cada etapa e no ecrã final. A execução automatizada permite integrar o fluxo num CI que tenha emulador, Appium e a app configurados.
 
-- `test_zu_smoke.py` launches the ZU app and confirms that it is in the foreground.
-   - `test_zu_home.py` handles the update prompt, moves through onboarding with the **Next** button, and checks that the app reaches the following screen.
+## Evidências
 
-The onboarding test pauses after each step so you can inspect or capture the screen. Run it with `-s` so pytest accepts Enter from the terminal.
+As demonstrações abaixo foram geradas a partir de gravações das sessões Appium:
 
-## Requirements
+| Arranque da aplicação | Onboarding | Ecrã final do onboarding |
+| --- | --- | --- |
+| ![Teste de arranque](docs/assets/smoke-test.gif) | ![Teste de onboarding](docs/assets/home-test.gif) | ![Etapas finais do onboarding](docs/assets/onboarding-final.gif) |
 
-- Windows, Python, and a project virtual environment.
-- Node.js, the Appium Server, and the Appium UiAutomator2 driver.
-- Android SDK Platform Tools (`adb`) and a running Android emulator.
-- The ZU app installed on the emulator (`pt.continente.ZU`).
-- FFmpeg on `PATH` to convert recordings to GIF. MP4 recordings are still saved without FFmpeg.
+## Requisitos
 
-The default emulator in the capabilities is `emulator-5554`.
+- Windows, Python e PowerShell.
+- Node.js, Appium Server e o driver UiAutomator2.
+- Android SDK Platform Tools (`adb`) e um emulador Android em execução.
+- App ZU instalada no emulador, com o pacote `pt.continente.ZU`.
+- FFmpeg no `PATH` para gerar o GIF de demonstração; a gravação MP4 funciona sem FFmpeg.
 
-## Set up the Python environment
+As capacidades usam por omissão o dispositivo `emulator-5554` e o servidor Appium em `http://127.0.0.1:4723`. Estes valores podem ser alterados com as variáveis `ZU_DEVICE_NAME`, `ZU_APP_PACKAGE`, `ZU_APP_ACTIVITY` e `ZU_APPIUM_URL`.
 
-Open a PowerShell terminal in the project directory:
+## Preparação e execução
+
+No diretório do projeto, crie e ative o ambiente virtual e instale as dependências:
 
 ```powershell
 py -m venv .venv
@@ -39,97 +45,92 @@ py -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-Install the UiAutomator2 driver once if it is not already installed:
+Instale o driver UiAutomator2 (uma vez, se ainda não estiver instalado):
 
 ```powershell
 appium driver install uiautomator2
 ```
 
-## Start the emulator, Appium, and the tests
+Inicie o emulador e confirme que o ADB o reconhece:
 
-1. Start the emulator in Android Studio and wait for its home screen.
-2. Check the Android connection with ADB:
+```powershell
+adb devices
+```
 
-   ```powershell
-   adb devices
-   ```
+Inicie o Appium numa janela PowerShell e deixe-o ativo:
 
-   The list should include `emulator-5554` with the state `device`.
+```powershell
+appium --address 127.0.0.1 --port 4723
+```
 
-3. Open a PowerShell terminal for Appium and leave it running while the tests execute:
+Execute os testes numa segunda janela. Por omissão, o onboarding avança sem intervenção:
 
-   ```powershell
-   appium --address 127.0.0.1 --port 4723
-   ```
+```powershell
+pytest -v
+```
 
-   Confirm that Appium is listening on the port used by the tests:
+Para pausar em cada etapa e inspecionar os ecrãs, ative o modo interativo. O `-s` deixa o pytest encaminhar os prompts de Enter para o terminal:
 
-   ```powershell
-   Test-NetConnection 127.0.0.1 -Port 4723
-   ```
+```powershell
+pytest -s -v --interactive-onboarding
+```
 
-   The expected result is `TcpTestSucceeded : True`.
+Exemplo de configuração alternativa no PowerShell:
 
-4. In a second terminal, activate `.venv` and run both tests:
+```powershell
+$env:ZU_DEVICE_NAME = "emulator-5556"
+$env:ZU_APPIUM_URL = "http://127.0.0.1:4725"
+pytest -v
+```
 
-   ```powershell
-   pytest -s -v tests/test_zu_smoke.py tests/test_zu_home.py
-   ```
-
-   The `-s` option lets the onboarding test receive Enter during its interactive pauses. Press Enter at each pause to advance. After the final step, the test checks that the **Next** button is gone.
-
-To run only the quick app launch check:
+Para executar apenas o teste de arranque:
 
 ```powershell
 pytest -v tests/test_zu_smoke.py
 ```
 
-To run without recording video:
+Para omitir a gravação de vídeo:
 
 ```powershell
 pytest -v --no-record-video tests/test_zu_smoke.py
 ```
 
-## Recordings and the README GIF
+## Artefactos
 
-The `appium_driver` fixture records the emulator screen for each Appium session. When the session ends, it saves:
+O fixture `appium_driver` inicia uma sessão por teste e tenta guardar:
 
-- An MP4 recording in `artifacts/videos/`.
-- A final screenshot in `artifacts/screenshots/`.
-- A selected screenshot in `docs/assets/app-screen.png` when the test passes.
-- A compact GIF in `docs/assets/demo.gif` when the test passes and FFmpeg is installed.
+- Vídeo MP4 em `artifacts/videos/` (limite de gravação do Android: 3 minutos por sessão).
+- Screenshot da sessão em `artifacts/screenshots/`, incluindo sessões que falham.
+- Quando o teste passa, screenshot de portfólio em `docs/assets/app-screen.png` e GIF em `docs/assets/demo.gif`, se o FFmpeg estiver disponível.
 
-Full MP4s and per-session screenshots stay local and are ignored by Git. The GIF and selected screenshot are small portfolio previews and can be committed so they appear on GitHub.
-
-To rebuild the GIF from the latest recording:
+Os MP4 e screenshots individuais são locais e estão excluídos do Git. Os previews em `docs/assets/` são versionados para aparecerem no README. Para reconstruir o GIF a partir da gravação mais recente:
 
 ```powershell
 python scripts/build_demo_gif.py
 ```
 
-To select a recording or a specific segment:
+Também é possível escolher a gravação e o segmento:
 
 ```powershell
 python scripts/build_demo_gif.py --input artifacts/videos/RECORDING_NAME.mp4 --start 5 --duration 12
 ```
 
-Android screen recording is limited to three minutes per session. The onboarding test may take longer because of its manual pauses, so its MP4 can stop when it reaches that limit.
-
-## Project structure
+## Estrutura
 
 ```text
 .
 ├── tests/
-│   ├── conftest.py          # Appium fixtures, onboarding, and artifact capture
-│   ├── test_zu_smoke.py     # App launch check
-│   └── test_zu_home.py      # Onboarding flow
+│   ├── conftest.py          # Sessão Appium, navegação de onboarding e evidências
+│   ├── test_zu_smoke.py     # Verificação de abertura da app
+│   └── test_zu_home.py      # Percurso de onboarding
 ├── scripts/
-│   └── build_demo_gif.py    # Converts MP4 recordings to GIF with FFmpeg
-├── artifacts/
-│   ├── videos/              # Per-session MP4 recordings (local, Git-ignored)
-│   └── screenshots/         # Per-session screenshots (local, Git-ignored)
-├── docs/assets/
-│   ├── demo.gif             # Animated preview shown at the top
-│   └── app-screen.png       # Screenshot from a passing test
-└── requirements.txt
+│   └── build_demo_gif.py    # Conversão de MP4 para GIF com FFmpeg
+├── docs/assets/             # GIFs e screenshot selecionado para o portfólio
+├── artifacts/               # Evidências locais, ignoradas pelo Git
+└── requirements.txt         # Dependências Python fixadas
 ```
+
+## Próximos passos
+
+- Validar conteúdo estável do ecrã final e guardar a hierarquia da interface para diagnóstico de falhas.
+- Documentar uma matriz de dispositivos e versões Android suportadas.

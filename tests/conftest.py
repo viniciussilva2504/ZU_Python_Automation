@@ -1,5 +1,6 @@
 import base64
 from datetime import datetime
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -29,6 +30,12 @@ def pytest_addoption(parser):
         default=False,
         help="Desativa a gravação de ecrã dos testes Appium.",
     )
+    parser.addoption(
+        "--interactive-onboarding",
+        action="store_true",
+        default=False,
+        help="Pausa em cada ecrã do onboarding e no ecrã final para inspeção manual.",
+    )
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -44,17 +51,20 @@ def appium_driver(request):
     options = UiAutomator2Options()
     options.platform_name = "Android"
     options.automation_name = "UiAutomator2"
-    options.device_name = "emulator-5554"
-    options.app_package = "pt.continente.ZU"
-    options.app_activity = "pt.continente.ZU.MainActivity"
+    options.device_name = os.getenv("ZU_DEVICE_NAME", "emulator-5554")
+    options.app_package = os.getenv("ZU_APP_PACKAGE", "pt.continente.ZU")
+    options.app_activity = os.getenv(
+        "ZU_APP_ACTIVITY", "pt.continente.ZU.MainActivity"
+    )
 
     options.set_capability("appium:uiautomator2ServerInstallTimeout", 120000)
     options.set_capability("appium:uiautomator2ServerLaunchTimeout", 120000)
     options.set_capability("appium:adbExecTimeout", 120000)
-    # As pausas interativas para capturas podem durar mais do que o limite padrão do Appium.
-    options.set_capability("appium:newCommandTimeout", 3600)
+    interactive = request.config.getoption("--interactive-onboarding")
+    options.set_capability("appium:newCommandTimeout", 3600 if interactive else 300)
 
-    driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
+    appium_url = os.getenv("ZU_APPIUM_URL", "http://127.0.0.1:4723")
+    driver = webdriver.Remote(appium_url, options=options)
     recording_started = False
     artifact_name = _artifact_name(request.node.nodeid)
     try:
@@ -188,12 +198,13 @@ def zu_home(appium_driver):
 
         botao_next.click()
         cliques_next += 1
-        print(
-            f"\nOnboarding: clique {cliques_next}. "
-            "A app ficará neste ecrã até carregares Enter. "
-            "Tira o print agora, se precisares."
-        )
-        input("Carrega Enter para avançar para o próximo passo do onboarding...")
+        if request.config.getoption("--interactive-onboarding"):
+            print(
+                f"\nOnboarding: clique {cliques_next}. "
+                "A app ficará neste ecrã até carregares Enter. "
+                "Tira o print agora, se precisares."
+            )
+            input("Carrega Enter para avançar para o próximo passo do onboarding...")
 
     assert cliques_next < limite_cliques, (
         f"O onboarding ainda tinha 'Next' após {limite_cliques} cliques."
